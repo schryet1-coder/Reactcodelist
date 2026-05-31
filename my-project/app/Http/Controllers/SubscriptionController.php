@@ -12,13 +12,18 @@ class SubscriptionController extends Controller
     public function index()
     {
         $plans = Subscription::where('active', true)->get();
-        return view('subscriptions.index', compact('plans'));
+        $current = auth()->check() ? auth()->user()->activeSubscription() : null;
+        return view('subscriptions.index', compact('plans', 'current'));
     }
 
     public function checkout(Request $request, Subscription $subscription)
     {
         if (!auth()->check()) {
-            return redirect('/login');
+            return redirect('/login')->with('message', 'Please login to purchase a subscription.');
+        }
+
+        if (!env('STRIPE_SECRET')) {
+            return redirect('/subscriptions')->with('message', 'Stripe configuration is missing.');
         }
 
         Stripe::setApiKey(env('STRIPE_SECRET'));
@@ -45,6 +50,6 @@ class SubscriptionController extends Controller
 
     public function success()
     {
-        return redirect('/')->with('message', 'Subscription payment initiated.');
+        return view('subscriptions.success');
     }
 }

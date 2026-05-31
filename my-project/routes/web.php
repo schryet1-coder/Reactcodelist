@@ -7,9 +7,27 @@ use App\Http\Controllers\ChannelController;
 use App\Http\Controllers\MatchController;
 use App\Http\Controllers\ReelController;
 use App\Http\Controllers\AdController;
+use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StripeWebhookController;
+use App\Http\Controllers\Admin\SubscriptionAdminController;
+use App\Http\Controllers\Admin\UserAdminController;
+use App\Http\Controllers\Admin\AdAdminController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
 
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/welcome', function () { return view('welcome'); });
+
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [LoginController::class, 'login']);
+    Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+    Route::post('/register', [RegisterController::class, 'register']);
+});
+
+Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth')->name('logout');
+Route::get('/dashboard', [ProfileController::class, 'index'])->middleware('auth')->name('dashboard');
 
 // Installer
 Route::get('/install', [InstallerController::class, 'show']);
@@ -34,21 +52,14 @@ Route::get('/ads', [AdController::class, 'index']);
 Route::post('/ads', [AdController::class, 'store']);
 
 // Subscriptions & Payments
-use App\Http\Controllers\SubscriptionController;
-
 Route::get('/subscriptions', [SubscriptionController::class, 'index']);
 Route::post('/subscriptions/checkout/{subscription}', [SubscriptionController::class, 'checkout']);
 Route::get('/subscriptions/success', [SubscriptionController::class, 'success']);
 
 // Stripe webhook
-use App\Http\Controllers\StripeWebhookController;
 Route::post('/webhook/stripe', [StripeWebhookController::class, 'handle']);
 
 // Admin routes
-use App\Http\Controllers\Admin\SubscriptionAdminController;
-use App\Http\Controllers\Admin\UserAdminController;
-use App\Http\Controllers\Admin\AdAdminController;
-
 Route::prefix('admin')->middleware(['auth', \App\Http\Middleware\IsAdmin::class])->group(function () {
 	Route::get('/', function(){ return redirect('/admin/subscriptions'); });
 	Route::get('/subscriptions', [SubscriptionAdminController::class, 'index']);

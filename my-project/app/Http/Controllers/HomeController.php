@@ -3,15 +3,25 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Ad;
 use App\Models\Channel;
 use App\Models\MatchModel;
-use App\Services\ExtremeService;
+use App\Models\Reel;
+use App\Models\Subscription;
 
 class HomeController extends Controller
 {
     public function index()
     {
-        return view('home');
+        $stats = [
+            'channels' => Channel::count(),
+            'matches' => MatchModel::count(),
+            'reels' => Reel::count(),
+            'ads' => Ad::count(),
+            'plans' => Subscription::where('active', true)->count(),
+        ];
+
+        return view('home', compact('stats'));
     }
 
     public function fetchByExtremeCode(Request $request)
