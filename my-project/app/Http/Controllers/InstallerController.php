@@ -67,6 +67,13 @@ class InstallerController extends Controller
             'is_admin' => true,
         ]);
 
+        // mark installed
+        try {
+            file_put_contents(storage_path('installed'), now()->toDateTimeString());
+        } catch (\Exception $e) {
+            // ignore
+        }
+
         return redirect('/')->with('message', 'Installation complete. Please login with the admin account.');
     }
 }
