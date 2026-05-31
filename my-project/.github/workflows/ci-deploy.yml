@@ -67,7 +67,22 @@ jobs:
           # Copy public into htdocs (public web root)
           rsync -av public/ deploy/htdocs/
 
+      - name: Make deploy script executable
+        run: chmod +x scripts/prepare_deploy.sh
+
+      - name: Create deploy artifact
+        run: |
+          mkdir -p artifacts
+          ./scripts/prepare_deploy.sh artifacts/deploy.zip
+
+      - name: Upload deploy artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-package
+          path: artifacts/deploy.zip
+
       - name: Upload htdocs to InfinityFree
+        if: ${{ secrets.INF_FTP_HOST && secrets.INF_FTP_USERNAME && secrets.INF_FTP_PASSWORD }}
         uses: SamKirkland/FTP-Deploy-Action@4.3.0
         with:
           server: ${{ secrets.INF_FTP_HOST }}
@@ -79,6 +94,7 @@ jobs:
           server-dir: /htdocs
 
       - name: Upload laravel_app to InfinityFree
+        if: ${{ secrets.INF_FTP_HOST && secrets.INF_FTP_USERNAME && secrets.INF_FTP_PASSWORD }}
         uses: SamKirkland/FTP-Deploy-Action@4.3.0
         with:
           server: ${{ secrets.INF_FTP_HOST }}

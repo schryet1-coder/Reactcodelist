@@ -31,13 +31,25 @@ Set the `STRIPE_WEBHOOK_SECRET` in `.env` to the secret provided by Stripe.
 
 ## CI and Deployment Instructions for InfinityFree
 
+The repository now includes a deploy package workflow that produces a downloadable `deploy.zip` artifact.
+
+You can also generate the package locally using:
+
+```bash
+./scripts/prepare_deploy.sh deploy.zip
+```
+
 To deploy your application on InfinityFree, follow these steps:
 
 1. **Create an InfinityFree Account**: Sign up at [InfinityFree](https://infinityfree.net).
 
-2. **Upload Your Files**: Use the file manager or an FTP client to upload your project files to the `htdocs` directory.
+2. **Download the deploy artifact**: After the GitHub Actions `deploy` job runs successfully, download the `deploy-package` artifact. It contains:
+   - `htdocs/` for the public web root
+   - `laravel_app/` for the application files
 
-3. **Set Up Your Database**: If your application uses a database, create a MySQL database via the InfinityFree control panel and import your database schema.
+3. **Upload Your Files**: Use the file manager or an FTP client to upload `htdocs/` contents to the `htdocs` directory and `laravel_app/` to a separate folder if needed.
+
+4. **Set Up Your Database**: If your application uses a database, create a MySQL database via the InfinityFree control panel and import your database schema.
 
 4. **Configure Environment Variables**: Update your `.env` file with the necessary configuration for your InfinityFree environment.
 
