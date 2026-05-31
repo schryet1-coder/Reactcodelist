@@ -21,4 +21,14 @@ class UserSubscription extends Model
     {
         return $this->belongsTo(Subscription::class);
     }
+
+    public function isActive(): bool
+    {
+        return $this->ends_at && $this->ends_at->isFuture();
+    }
+
+    public function remainingDays(): int
+    {
+        return $this->ends_at ? now()->diffInDays($this->ends_at, false) : 0;
+    }
 }

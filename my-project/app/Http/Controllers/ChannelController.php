@@ -7,10 +7,21 @@ use App\Models\Channel;
 
 class ChannelController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $channels = Channel::latest()->get();
-        return view('channels.index', compact('channels'));
+        $query = trim($request->input('q', ''));
+
+        $channels = Channel::query()
+            ->when($query, function ($builder) use ($query) {
+                $builder->where(function ($sub) use ($query) {
+                    $sub->where('name', 'like', "%{$query}%")
+                        ->orWhere('identifier', 'like', "%{$query}%");
+                });
+            })
+            ->latest()
+            ->get();
+
+        return view('channels.index', compact('channels', 'query'));
     }
 
     public function show(Channel $channel)

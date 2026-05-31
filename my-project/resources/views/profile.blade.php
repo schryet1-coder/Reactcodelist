@@ -26,6 +26,7 @@
                     <dd class="col-sm-8">
                         @if($user->hasActiveSubscription())
                             {{ $user->activeSubscription()->subscription->name }} until {{ $user->activeSubscription()->ends_at->format('M d, Y') }}
+                            <span class="d-block text-muted">{{ $user->activeSubscription()->remainingDays() }} day{{ $user->activeSubscription()->remainingDays() === 1 ? '' : 's' }} remaining</span>
                         @else
                             No active plan. <a href="{{ url('/subscriptions') }}">Choose a plan</a>.
                         @endif

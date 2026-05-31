@@ -29,10 +29,11 @@ class HomeController extends Controller
         $request->validate(['code' => 'required|string']);
         $code = $request->input('code');
 
-        // Dispatch job to fetch channels (runs sync if queue worker not configured)
-        \App\Jobs\FetchChannelsJob::dispatch($code)->onQueue('default');
+        // Dispatch job to fetch channels from the Extreme API.
+        // When queue worker is not configured, it will run immediately.
+        \App\Jobs\FetchChannelsJob::dispatchSync($code);
 
-        return redirect()->back()->with('message', 'Channel fetch dispatched.');
+        return redirect()->back()->with('message', 'Channel fetch completed. Check the Channels page for updated results.');
     }
 
     public function fetchMatchesFromSite(Request $request)
@@ -40,12 +41,26 @@ class HomeController extends Controller
         $request->validate(['site_url' => 'required|url']);
         $site = $request->input('site_url');
 
-        // Placeholder: actual scraping/parsing would go here
+        $title = null;
+        try {
+            $html = file_get_contents($site);
+            if ($html) {
+                if (preg_match('/<meta\s+property=["\']og:title["\']\s+content=["\']([^"\']+)["\']/i', $html, $matches)) {
+                    $title = trim($matches[1]);
+                } elseif (preg_match('/<title>(.*?)<\/title>/is', $html, $matches)) {
+                    $title = trim($matches[1]);
+                }
+            }
+        } catch (\Throwable $e) {
+            logger()->warning('Failed to scrape match source: ' . $e->getMessage());
+        }
+
         MatchModel::create([
-            'title' => "Example Match from {$site}",
+            'title' => $title ?: "Imported match from {$site}",
             'external_url' => $site,
+            'meta' => ['source' => $site],
         ]);
 
-        return redirect()->back()->with('message', 'Matches scraped (stub) and saved.');
+        return redirect()->back()->with('message', 'Match source imported successfully.');
     }
 }
