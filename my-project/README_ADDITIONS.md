@@ -1,6 +1,5 @@
 How to run background worker and Stripe webhook
 
-- Ensure `.env` contains:
   - `EXTREME_API_URL` and `EXTREME_API_KEY` for channel fetching
   - `STRIPE_SECRET` and `STRIPE_PUBLISHABLE_KEY` for payments
   - `STRIPE_WEBHOOK_SECRET` for webhook signature verification
@@ -29,3 +28,21 @@ https://<your-host>/webhook/stripe
 ```
 
 Set the `STRIPE_WEBHOOK_SECRET` in `.env` to the secret provided by Stripe.
+
+## CI and Deployment Instructions for InfinityFree
+
+To deploy your application on InfinityFree, follow these steps:
+
+1. **Create an InfinityFree Account**: Sign up at [InfinityFree](https://infinityfree.net).
+
+2. **Upload Your Files**: Use the file manager or an FTP client to upload your project files to the `htdocs` directory.
+
+3. **Set Up Your Database**: If your application uses a database, create a MySQL database via the InfinityFree control panel and import your database schema.
+
+4. **Configure Environment Variables**: Update your `.env` file with the necessary configuration for your InfinityFree environment.
+
+5. **Access Your Application**: Your application will be accessible at `https://yourusername.epizy.com` (replace `yourusername` with your InfinityFree account username).
+
+6. **Set Up Cron Jobs**: If you need to run scheduled tasks, set up cron jobs in the InfinityFree control panel.
+
+7. **Monitor Your Application**: Keep an eye on your application’s performance and error logs through the InfinityFree dashboard.
